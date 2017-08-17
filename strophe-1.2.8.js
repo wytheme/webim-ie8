@@ -312,7 +312,7 @@
             },
             str_sha1: function (s) {
                 return binb2str(core_sha1(str2binb(s), s.length * 8));
-            },
+            }
         };
     }));
 
@@ -4168,7 +4168,7 @@
             $pres: $pres,
             SHA1: SHA1,
             Base64: Base64,
-            MD5: MD5,
+            MD5: MD5
         };
     }));
 
@@ -4497,7 +4497,9 @@
              *      allowed range of request ids that are valid.  The default is 5.
              */
             _restore: function (jid, callback, wait, hold, wind) {
-                var session = JSON.parse(window.sessionStorage.getItem('strophe-bosh-session'));
+                var session = undefined;
+                if(JSON)
+                    session = JSON.parse(window.sessionStorage.getItem('strophe-bosh-session'));
                 if (typeof session !== "undefined" &&
                     session !== null &&
                     session.rid &&
@@ -4521,11 +4523,12 @@
             _cacheSession: function () {
                 if (this._conn.authenticated) {
                     if (this._conn.jid && this.rid && this.sid) {
-                        window.sessionStorage.setItem('strophe-bosh-session', JSON.stringify({
-                            'jid': this._conn.jid,
-                            'rid': this.rid,
-                            'sid': this.sid
-                        }));
+                        if(JSON)
+                            window.sessionStorage.setItem('strophe-bosh-session', JSON.stringify({
+                                'jid': this._conn.jid,
+                                'rid': this.rid,
+                                'sid': this.sid
+                            }));
                     }
                 } else {
                     window.sessionStorage.removeItem('strophe-bosh-session');
@@ -4858,7 +4861,7 @@
                 var self = this;
                 var req = this._requests[i];
                 console.log('********************************')
-                console.log(JSON.stringify(this._requests), i)
+                // console.log(JSON.stringify(this._requests), i)
                 var reqStatus = -1;
 
                 try {
@@ -4946,7 +4949,8 @@
                         // 没有sid的ping操作终止
                         //if (req.data.indexOf('urn:xmpp:ping') !== -1 && !self.sid) return
                         //console.log('----------------------------------------')
-                        Strophe.debug("send: " + JSON.stringify(req.data))
+                        // if(JSON)
+                        //     Strophe.debug("send: " + JSON.stringify(req.data))
                         //console.log('service: ', self._conn.service)
                         //console.log('sid: ', self.sid)
                         //req.xhr.open("POST", self._conn.service, self._conn.options.sync ? false : true);

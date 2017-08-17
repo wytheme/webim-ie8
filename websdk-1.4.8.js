@@ -112,6 +112,7 @@
                 if (typeof window.XDomainRequest === 'undefined') {
                     return temp;
                 }
+                alert("XDomainRequest");
                 var xhr = new XDomainRequest();
                 xhr.readyState = 0;
                 xhr.status = 100;
@@ -259,11 +260,19 @@
             var _tmpUtilXHR = _xmlrequest(),
                 _hasFormData = typeof FormData !== 'undefined',
                 _hasBlob = typeof Blob !== 'undefined',
-                _isCanSetRequestHeader = _tmpUtilXHR.setRequestHeader || false,
+                _isCanSetRequestHeader = false,
                 _hasOverrideMimeType = _tmpUtilXHR.overrideMimeType || false,
                 _isCanUploadFileAsync = _isCanSetRequestHeader && _hasFormData,
                 _isCanUploadFile = _isCanUploadFileAsync || _hasFlash,
                 _isCanDownLoadFile = _isCanSetRequestHeader && (_hasBlob || _hasOverrideMimeType);
+
+            var browser = navigator.appName;
+            var b_version = navigator.appVersion;
+            var version = b_version.split(";");
+            var trim_Version = version[1].replace(/[ ]/g, "");
+            if (browser != "Microsoft Internet Explorer" || trim_Version != "MSIE6.0") {
+                _isCanSetRequestHeader = _tmpUtilXHR.setRequestHeader || false;
+            }
 
             if (!Object.keys) {
                 Object.keys = function () {
@@ -2112,7 +2121,7 @@
                     _login(data, conn);
                 };
                 var error = function error(res, xhr, msg) {
-                    console.log('error')
+                    alert('Token error')
                     if (options.error) options.error();
                     if (location.protocol != 'https:' && conn.isHttpDNS) {
                         if (conn.restIndex + 1 < conn.restTotal) {
@@ -2154,7 +2163,6 @@
                     success: suc || _utils.emptyfn,
                     error: error || _utils.emptyfn
                 };
-                console.log('ajax')
                 _utils.ajax(options2);
             }
         };

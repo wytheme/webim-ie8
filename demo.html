@@ -1,6 +1,7 @@
 <!--本Demo登陆测试帐号：mengyuanyuan，密码：123456, 测试对方账号：asdfghj，密码：123456-->
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Clock</title>
     <script src="./webim.config.js"></script>
     <script src="./strophe-1.2.8.js"></script>
@@ -103,7 +104,7 @@
     /**
      * Created by clock on 16-11-25.
      */
-    var conn = {};
+    var conn = {}, noLog = false;
     conn = new WebIM.connection({
         isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
         https: typeof WebIM.config.https === 'boolean' ? WebIM.config.https : location.protocol === 'https:',
@@ -113,62 +114,96 @@
         autoReconnectNumMax: WebIM.config.autoReconnectNumMax,
         autoReconnectInterval: WebIM.config.autoReconnectInterval
     });
+    var browser = navigator.appName;
+    var b_version = navigator.appVersion;
+    var version = b_version.split(";");
+    var trim_Version = version[1].replace(/[ ]/g, "");
+    if (browser == "Microsoft Internet Explorer"
+        && (trim_Version == "MSIE6.0" || trim_Version == "MSIE7.0" || trim_Version == "MSIE8.0" || trim_Version == "MSIE9.0")) {
+        noLog = true;
+    }
 
     // 初始化上传组件 fileInputId对应页面上的file组件id
     WebIM.flashUpload = UploadShim({fileInputId: 'image'}, conn).flashUpload;
 
 
-    // listern，添加回调函数
+    // listern，添加回调函数;
     conn.listen({
-        onOpened: function (message) {          //连接成功回调，连接成功后才可以发送消息
+        onOpened: function (message) {
+            //连接成功回调，连接成功后才可以发送消息
             //如果isAutoLogin设置为false，那么必须手动设置上线，否则无法收消息
             // 手动上线指的是调用conn.setPresence(); 在本例中，conn初始化时已将isAutoLogin设置为true
             // 所以无需调用 conn.setPresence();
-
-            console.log("opened");
+            alert("Opened");
+            if (noLog) {
+                alert("opened");
+            } else {
+                console.log("opened");
+            }
         },
         onTextMessage: function (message) {
-            // 在此接收和处理消息，根据message.type区分消息来源，私聊或群组或聊天室
-            console.log(message.type);
-            console.log('Text');
-        },  //收到文本消息
+            // 在此接收和处理消息，根据message.type区分消息来源，私聊或群组或聊天室;
+            if (noLog) {
+                alert(message.type);
+                alert("Text");
+            } else {
+                console.log(message.type);
+                console.log("Text");
+            }
+        },  //收到文本消息;
         onEmojiMessage: function (message) {
             // 当为WebIM添加了Emoji属性后，若发送的消息含WebIM.Emoji里特定的字符串，connection就会自动将
             // 这些字符串和其它文字按顺序组合成一个数组，每一个数组元素的结构为{type: 'emoji(或者txt)', data:''}
-            // 当type='emoji'时，data表示表情图像的路径，当type='txt'时，data表示文本消息
-            console.log('Emoji');
+            // 当type='emoji'时，data表示表情图像的路径，当type='txt'时，data表示文本消息;
+            if (noLog) {
+                alert("Emoji");
+            } else {
+                console.log("Emoji");
+            }
             var data = message.data;
             for (var i = 0, l = data.length; i < l; i++) {
-                console.log(data[i]);
+                if (noLog) {
+                    alert(data[i]);
+                } else {
+                    console.log(data[i]);
+                }
             }
-        },   //收到表情消息
+        },   //收到表情消息;
         onPictureMessage: function (message) {
-            console.log('Picture');
+            if (noLog) {
+                alert('Picture');
+            } else {
+                console.log('Picture');
+            }
 
             var options = {url: message.url};
             options.onFileDownloadComplete = function () {
                 // 图片下载成功
-                console.log('Image download complete!');
+                if (noLog) {
+                    alert('Image download complete!');
+                } else {
+                    console.log('Image download complete!');
+                }
             };
             options.onFileDownloadError = function () {
                 // 图片下载失败
                 console.log('Image download failed!');
             };
-            WebIM.utils.download.call(conn, options);       // 意义待查
+            WebIM.utils.download.call(conn, options);       // 意义待查;
 
-        }, //收到图片消息
+        }, //收到图片消息;
         onCmdMessage: function (message) {
             console.log('CMD');
-        },     //收到命令消息
+        },     //收到命令消息;
         onAudioMessage: function (message) {
             console.log("Audio");
-        },   //收到音频消息
+        },   //收到音频消息;
         onLocationMessage: function (message) {
             console.log("Location");
-        },//收到位置消息
+        },//收到位置消息;
         onFileMessage: function (message) {
             console.log("File");
-        },    //收到文件消息
+        },    //收到文件消息;
         onVideoMessage: function (message) {
             var node = document.getElementById('privateVideo');
             var option = {
@@ -185,67 +220,67 @@
                 }
             };
             WebIM.utils.download.call(conn, option);
-        },   //收到视频消息
+        },   //收到视频消息;
         onPresence: function (message) {
             switch (message.type) {
-                case 'subscribe':                           // 对方请求添加好友
-                    // 同意对方添加好友
+                case 'subscribe':                           // 对方请求添加好友;
+                    // 同意对方添加好友;
                     document.getElementById('agreeFriends').onclick = function (message) {
                         conn.subscribed({
                             to: 'asdfghj',
                             message: "[resp:true]"
                         });
-                        // 需要反向添加对方好友
+                        // 需要反向添加对方好友;
                         conn.subscribe({
                             to: message.from,
                             message: "[resp:true]"
                         });
                     };
-                    // 拒绝对方添加好友
+                    // 拒绝对方添加好友;
                     document.getElementById('rejectFriends').onclick = function (message) {
                         conn.unsubscribed({
                             to: message.from,
-                            message: "rejectAddFriend"                  // 拒绝添加好友回复信息
+                            message: "rejectAddFriend"                  // 拒绝添加好友回复信息;
                         });
                     };
 
                     break;
-                case 'subscribed':                          // 对方同意添加好友，已方同意添加好友
+                case 'subscribed':                          // 对方同意添加好友，已方同意添加好友;
                     break;
-                case 'unsubscribe':                         // 对方删除好友
+                case 'unsubscribe':                         // 对方删除好友;
                     break;
-                case 'unsubscribed':                        // 被拒绝添加好友，或被对方删除好友成功
+                case 'unsubscribed':                        // 被拒绝添加好友，或被对方删除好友成功;
                     break;
-                case 'joinChatRoomSuccess':                 // 成功加入聊天室
+                case 'joinChatRoomSuccess':                 // 成功加入聊天室;
                     console.log('join chat room success');
                     break;
-                case 'joinChatRoomFaild':                   // 加入聊天室失败
+                case 'joinChatRoomFaild':                   // 加入聊天室失败;
                     console.log('join chat room faild');
                     break;
-                case 'joinPublicGroupSuccess':              // 意义待查
+                case 'joinPublicGroupSuccess':              // 意义待查;
                     console.log('join public group success', message.from);
                     break;
             }
-        },       //收到联系人订阅请求（加好友）、处理群组、聊天室被踢解散等消息
+        },       //收到联系人订阅请求（加好友）、处理群组、聊天室被踢解散等消息;
         onRoster: function (message) {
             console.log('Roster');
-        },         //处理好友申请
+        },         //处理好友申请;
         onInviteMessage: function (message) {
             console.log('Invite');
-        },  //处理群组邀请
+        },  //处理群组邀请;
         onOnline: function () {
             console.log('onLine');
-        },                  //本机网络连接成功
+        },                  //本机网络连接成功;
         onOffline: function () {
             console.log('offline');
-        },                 //本机网络掉线
+        },                 //本机网络掉线;
         onError: function (message) {
-            console.log('Error', JSON.stringify(message));
-        },           //失败回调
+            console.log('Error', WebIM.utils.stringify(message));
+        },           //失败回调;
         onBlacklistUpdate: function (list) {
-            // 查询黑名单，将好友拉黑，将好友从黑名单移除都会回调这个函数，list则是黑名单现有的所有好友信息
+            // 查询黑名单，将好友拉黑，将好友从黑名单移除都会回调这个函数，list则是黑名单现有的所有好友信息;
             console.log(list);
-        }     // 黑名单变动
+        }     // 黑名单变动;
     });
     // 初始化WebRTC Call
     //    var rtcCall = new WebIM.WebRTC.Call({
@@ -290,14 +325,34 @@
     /**
      * Created by clock on 16-11-30.
      */
-// open，登录
+// open，登录;
     var options = {
         apiUrl: WebIM.config.apiURL,
-        user: "mengyuanyuan",
-        pwd: "123456",
+        user: "zzf1",
+        pwd: "z",
         appKey: WebIM.config.appkey
     };
-    conn.open(options);
+    try {
+        conn.open(options);
+    } catch (e) {
+        alert('open fail'+e.message)
+    }
+
+    // 私聊发送文本消息，发送表情同发送文本消息，只是会在对方客户端将表情文本进行解析成图片;
+    var sendPrivateText = function () {
+        var id = conn.getUniqueId();
+        var msg = new WebIM.message('txt', id);
+        msg.set({
+            msg: 'scarecrow',                       // 消息内容;
+            to: 'ss007cc',                          // 接收消息对象;
+            roomType: false,
+            success: function (id, serverMsgId) {
+                console.log("send private text Success");
+            }
+        });
+        msg.body.chatType = 'singleChat';
+        conn.send(msg.body);
+    };
 
     var register = function () {
         var option = {
@@ -316,23 +371,7 @@
         conn.signup(option);
     };
 
-    // 私聊发送文本消息，发送表情同发送文本消息，只是会在对方客户端将表情文本进行解析成图片
-    var sendPrivateText = function () {
-        var id = conn.getUniqueId();
-        var msg = new WebIM.message('txt', id);
-        msg.set({
-            msg: 'scarecrow',                       // 消息内容
-            to: 'ss007cc',                          // 接收消息对象
-            roomType: false,
-            success: function (id, serverMsgId) {
-                console.log("send private text Success");
-            }
-        });
-        msg.body.chatType = 'singleChat';
-        conn.send(msg.body);
-    };
-
-    // 私聊发送命令消息
+    // 私聊发送命令消息;
     var sendPrivateCmd = function () {
         var id = conn.getUniqueId();
         var msg = new WebIM.message('cmd', id);
@@ -348,12 +387,12 @@
         conn.send(msg.body);
     };
 
-    // 私聊发送图片消息
+    // 私聊发送图片消息;
     var sendPrivateImg = function () {
         var id = conn.getUniqueId();
         var msg = new WebIM.message('img', id);
-        var input = document.getElementById('image');               // 选择图片的input
-        var file = WebIM.utils.getFileUrl(input);                   // 将图片转化为二进制文件
+        var input = document.getElementById('image');               // 选择图片的input;
+        var file = WebIM.utils.getFileUrl(input);                   // 将图片转化为二进制文件;
         var allowType = {
             'jpg': true,
             'gif': true,
@@ -361,7 +400,7 @@
             'bmp': true
         };
         console.log(file)
-//        if (file.filetype.toLowerCase() in allowType) {
+//        if (file.filetype.toLowerCase() in allowType) {;
         console.log('send', WebIM.config.apiURL);
         var option = {
             apiUrl: WebIM.config.apiURL,
@@ -378,15 +417,15 @@
             },
             success: function () {
                 console.log('Success');
-            },
-            // flashUpload: WebIM.flashUpload               // 意义待查
+            }
+            // flashUpload: WebIM.flashUpload               // 意义待查;
         };
         msg.set(option);
         conn.send(msg.body);
-//        }
+//        };
     };
 
-    // 获取好友列表
+    // 获取好友列表;
     var getRoasters = function () {
         var option = {
             success: function (roster) {
@@ -402,7 +441,7 @@
                  // to 和 from意义待定
                  // 如果添加对方为好友被拒绝则为none
                  }
-                 ]
+                 ];
                  */
                 for (var o in roster) {
                     console.log("jid: ", roster[o].jid);
@@ -414,15 +453,15 @@
         conn.getRoster(option);
     };
 
-    // 添加好友
+    // 添加好友;
     var addFriends = function () {
         conn.subscribe({
             to: "asdfghj",
-            message: "Hello World!"                   // Demo里面接收方没有展现出来这个message，在status字段里面
+            message: "Hello World!"                   // Demo里面接收方没有展现出来这个message，在status字段里面;
         });
     };
 
-    // 删除好友
+    // 删除好友;
     var removeFriends = function () {
         conn.removeRoster({
             to: 'asdfghj',
@@ -463,11 +502,11 @@
      }
      }
      jid, username, subscription均在获取好友列表时已获取到，用户可根据好友列表动态获取这些参数，
-     order不重复即可
+     order不重复即可;
      */
     var addToBlackList = function () {
         var list = {
-            // user_1
+            // user_1;
             asdfghj: {
                 jid: "easemob-demo#chatdemoui_asdfghj@easemob.com",
                 name: "asdfghj",
@@ -475,7 +514,7 @@
                 order: 2,
                 type: 'jid'
             },
-            // user_2
+            // user_2;
             wjy6: {
                 jid: "easemob-demo#chatdemoui_wjy6@easemob.com",
                 name: "wjy6",
@@ -496,12 +535,12 @@
         });
     }
 
-    // 获取好友黑名单，调用这个函数会回调conn.listen里的onBlacklistUpdate函数，具体细节请参照test.js
+    // 获取好友黑名单，调用这个函数会回调conn.listen里的onBlacklistUpdate函数，具体细节请参照test.js;
     var getBlackList = function () {
         conn.getBlacklist();
     };
 
-    // 将好友从黑名单拉出来
+    // 将好友从黑名单拉出来;
     var removeBlackList = function () {
         var list = {};
         conn.removeFromBlackList({
@@ -516,14 +555,14 @@
         });
     };
 
-    // 聊天室发送文本消息
+    // 聊天室发送文本消息;
     var sendRoomText = function () {
-        // 退出聊天室
+        // 退出聊天室;
         var id = conn.getUniqueId();
         var msg = new WebIM.message('txt', id);
         var option = {
-            msg: 'scarecrfow',                       // 消息内容
-            to: '114715680632209992',               // 接收消息对象(本例为twy-room1聊天室)
+            msg: 'scarecrfow',                       // 消息内容;
+            to: '114715680632209992',               // 接收消息对象(本例为twy-room1聊天室);
             roomType: true,
             chatType: 'chatRoom',
             success: function () {
@@ -537,26 +576,26 @@
         msg.setGroup('groupchat');
         conn.send(msg.body);
     };
-    // 加入聊天室
+    // 加入聊天室;
     var joinRoom = function () {
-        // 加入聊天室
+        // 加入聊天室;
         conn.joinChatRoom({
             roomId: "114715680632209992"
         });
     };
-    // 退出聊天室
+    // 退出聊天室;
     var quitRoom = function () {
-        // 退出聊天室
+        // 退出聊天室;
         conn.quitChatRoom({
             roomId: "114715680632209992"
         });
     };
-    // 列出所有聊天室，支持分页查询
+    // 列出所有聊天室，支持分页查询;
     var listRooms = function () {
         var option = {
             apiUrl: 'https://a1.easemob.com',
-            pagenum: 1,                                 // 页数
-            pagesize: 20,                               // 每页个数
+            pagenum: 1,                                 // 页数;
+            pagesize: 20,                               // 每页个数;
             success: function (list) {
                 console.log(list);
             },
@@ -567,13 +606,13 @@
         conn.getChatRooms(option);
     }
 
-    // 群组发送文本消息
+    // 群组发送文本消息;
     var sendGroupText = function () {
         var id = conn.getUniqueId();
         var msg = new WebIM.message('txt', id);
         var option = {
-            msg: 'scarecrfow',                       // 消息内容
-            to: '1480567165764',                     // 接收消息对象(本例为Test聊天室)
+            msg: 'scarecrfow',                       // 消息内容;
+            to: '1480567165764',                     // 接收消息对象(本例为Test聊天室);
             roomType: false,
             chatType: 'chatRoom',
             success: function () {
@@ -587,20 +626,20 @@
         msg.setGroup('groupchat');
         conn.send(msg.body);
     };
-    // 建立一个群组
+    // 建立一个群组;
     var createGroup = function () {
         var option = {
-            subject: 'groupName',                       // 群名称
-            description: 'create a group test',         // 群简介
-            members: ['wjy6', 'asdfghj'],               // 以数组的形式存储需要加群的好友ID
-            optionsPublic: true,                        // 允许任何人加入
-            optionsModerate: false,                     // 加入需审批
-            optionsMembersOnly: false,                  // 不允许任何人主动加入
-            optionsAllowInvites: false                  // 允许群人员邀请
+            subject: 'groupName',                       // 群名称;
+            description: 'create a group test',         // 群简介;
+            members: ['wjy6', 'asdfghj'],               // 以数组的形式存储需要加群的好友ID;
+            optionsPublic: true,                        // 允许任何人加入;
+            optionsModerate: false,                     // 加入需审批;
+            optionsMembersOnly: false,                  // 不允许任何人主动加入;
+            optionsAllowInvites: false                  // 允许群人员邀请;
         };
         conn.createGroup(option);
     }
-    // 获取群组信息（应用场景：判断用户是否为该群管理员）
+    // 获取群组信息（应用场景：判断用户是否为该群管理员）;
     var queryGroupInfo = function () {
         conn.queryRoomInfo({
             roomId: '1480747027186',
@@ -616,7 +655,7 @@
              name: "123",                        // 群名称
              occupants: "2",                     // 意义待查
              owner: "easemob-demo#chatdemoui_mengyuanyuan"               // 群主jid
-             }
+             };
              */
             success: function (settings, members, fields) {
                 console.log('settings: ', settings);
@@ -628,7 +667,7 @@
             }
         });
     };
-    // 成员主动离开群
+    // 成员主动离开群;
     var leaveGroup = function () {
         var option = {
             to: 'asdfghj',
@@ -642,19 +681,19 @@
         };
         conn.leaveGroupBySelf(option);
     };
-    // 将成员踢出群(同将群成员拉入群黑名单)
+    // 将成员踢出群(同将群成员拉入群黑名单);
     var addToGroupBlackList = function () {
         var option = {
-            affiliation: "owner",                       // 写死
-            roomId: "1480756943693",                    // 群组ID
+            affiliation: "owner",                       // 写死;
+            roomId: "1480756943693",                    // 群组ID;
             success: function () {
                 console.log('add to black list succeed');
             },
-            to: 'asdfghj'                               // 需要删除的成员ID
+            to: 'asdfghj'                               // 需要删除的成员ID;
         };
         conn.addToGroupBlackList(option);
     };
-    // 列出所有群组
+    // 列出所有群组;
     var listGroups = function () {
         var option = {
             success: function (rooms) {
@@ -666,7 +705,7 @@
         };
         conn.listRooms(option);
     };
-    // 修改群信息
+    // 修改群信息;
     var changeGroupInfo = function () {
         var option = {
             roomId: '1480756943693',
@@ -678,7 +717,7 @@
         };
         conn.changeGroupSubject(option);
     };
-    // 获取群组黑名单
+    // 获取群组黑名单;
     var getGroupBlackList = function () {
         var option = {
             roomId: '1480758709661',
@@ -691,7 +730,7 @@
         };
         conn.getGroupBlacklist(option);
     };
-    // 解散一个群组
+    // 解散一个群组;
     var destroyGroup = function () {
         var option = {
             reason: 'Test Destroy Group',
@@ -702,7 +741,7 @@
         };
         conn.destroyGroup(option);
     };
-    // 加好友入群
+    // 加好友入群;
     var addGroupMembers = function () {
         var option = {
             list: ['asdfghj', 'wjy6'],
@@ -710,7 +749,7 @@
         };
         conn.addGroupMembers(option);
     };
-    // 将好友从黑名单移除
+    // 将好友从黑名单移除;
     var removeFromGroupBlackList = function () {
         var option = {
             roomId: '1480841456167',
@@ -724,7 +763,7 @@
 
     // 查询群组成员，此方法亦可查询聊天室成员
     // 查询出来的member的结构为{affiliation: 'member', jid: "easemob-demo#chatdemoui_wjy6@easemob.com"}
-    // 注意，这里的jid格式，成员的用户名是chatdemoui_之后，@easemob.com之前的字符串，如本例的wjy6是用户名
+    // 注意，这里的jid格式，成员的用户名是chatdemoui_之后，@easemob.com之前的字符串，如本例的wjy6是用户名;
     var queryRoomMember = function () {
         var member = '';
         conn.queryRoomMember({
@@ -741,16 +780,16 @@
     /*
      * WebRTC
      */
-    // 视频呼叫对方
+    // 视频呼叫对方;
     var call = function () {
         rtcCall.caller = 'mengyuanyuan';
         rtcCall.makeVideoCall('asdfghj');
     };
-    // 关掉/拒绝视频
+    // 关掉/拒绝视频;
     var endCall = function () {
         rtcCall.endCall();
     }
-    // 接受对方呼叫
+    // 接受对方呼叫;
     var acceptCall = function () {
         rtcCall.acceptCall();
     }
