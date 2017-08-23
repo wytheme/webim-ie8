@@ -366,7 +366,7 @@
                     return null;
                 }(),
 
-                stringify: function stringify(json) {
+                /*stringify: function stringify(json) {
                     if (typeof JSON !== 'undefined' && JSON.stringify) {
                         return JSON.stringify(json);
                     } else {
@@ -384,16 +384,19 @@
                             }
 
                             for (var o in json) {
-                                if (Object.prototype.toString.call(json[o]) === '[object Null]') {
-                                    json[o] = 'null';
-                                } else if (Object.prototype.toString.call(json[o]) === '[object Undefined]') {
-                                    json[o] = 'undefined';
-                                }
+                                if(json.hasOwnProperty(o) && isNaN(o)){
+                                    alert("O: "+o);
+                                    if (Object.prototype.toString.call(json[o]) === '[object Null]') {
+                                        json[o] = 'null';
+                                    } else if (Object.prototype.toString.call(json[o]) === '[object Undefined]') {
+                                        json[o] = 'undefined';
+                                    }
 
-                                if (json[o] && _typeof(json[o]) === 'object') {
-                                    s += ',' + (isArr ? '' : '"' + o + '":' + (isArr ? '"' : '')) + iterate(json[o]) + '';
-                                } else {
-                                    s += ',"' + (isArr ? '' : o + '":"') + json[o] + '"';
+                                    if (json[o] && _typeof(json[o]) === 'object') {
+                                        s += ',' + (isArr ? '' : '"' + o + '":' + (isArr ? '"' : '')) + iterate(json[o]) + '';
+                                    } else {
+                                        s += ',"' + (isArr ? '' : o + '":"') + json[o] + '"';
+                                    }
                                 }
                             }
 
@@ -405,7 +408,37 @@
                         };
                         return iterate(json);
                     }
+                },*/
+
+                stringify: function stringify(obj) {
+                    if (window.JSON) {
+                        return JSON.stringify(obj);
+                    }
+                    var t = typeof (obj);
+                    if (t != "object" || obj === null) {
+                        // simple data type
+                        if (t == "string") obj = '"' + obj + '"';
+                        return String(obj);
+                    } else {
+                        // recurse array or object
+                        var n, v, json = [], arr = (obj && obj.constructor == Array);
+
+                        // fix.
+                        var self = arguments.callee;
+
+                        for (n in obj) {
+                            v = obj[n];
+                            t = typeof(v);
+                            if (obj.hasOwnProperty(n)) {
+                                if (t == "string") v = '"' + v + '"'; else if (t == "object" && v !== null)
+                                    v = self(v);
+                                json.push((arr ? "" : '"' + n + '":') + String(v));
+                            }
+                        }
+                        return (arr ? "[" : "{") + String(json) + (arr ? "]" : "}");
+                    }
                 },
+
                 login: function login(options) {
                     var options = options || {};
                     var suc = options.success || EMPTYFN;
@@ -922,7 +955,6 @@
                     var xhr = utils.xmlrequest();
 
                     xhr.onreadystatechange = function () {
-                        console.log(xhr.readyState, xhr.status)
                         if (xhr.readyState === 4) {
                             var status = xhr.status || 0;
                             if (status === 200) {
@@ -1515,7 +1547,11 @@
             if (conn.route) {
                 stropheConn.connect(conn.context.jid, '$t$' + accessToken, callback, conn.wait, conn.hold, conn.route);
             } else {
-                stropheConn.connect(conn.context.jid, '$t$' + accessToken, callback, conn.wait, conn.hold);
+                try {
+                    stropheConn.connect(conn.context.jid, '$t$' + accessToken, callback, conn.wait, conn.hold);
+                } catch (e) {
+                    alert("Error: " + _utils.stringify(e));
+                }
             }
         };
 
@@ -2114,14 +2150,14 @@
                 var orgName = this.context.orgName;
 
                 var suc = function suc(data, xhr) {
-                    console.log('suc')
+                    alert("Login succeed, Token: " + data.access_token);
                     conn.context.status = _code.STATUS_DOLOGIN_IM;
                     conn.context.restTokenData = data;
                     if (options.success) options.success(data);
                     _login(data, conn);
                 };
                 var error = function error(res, xhr, msg) {
-                    alert('Token error')
+                    alert('Token error: ' + xhr)
                     if (options.error) options.error();
                     if (location.protocol != 'https:' && conn.isHttpDNS) {
                         if (conn.restIndex + 1 < conn.restTotal) {
@@ -2807,6 +2843,7 @@
                     _msgHash[message.id] = new _message(message);
                     _msgHash[message.id].send(this);
                 } else if (typeof message === 'string') {
+                    alert("Str Msg");
                     _msgHash[message] && _msgHash[message].send(this);
                 }
             }
@@ -4277,14 +4314,26 @@
                     message.ext.weichat = message.ext.weichat || {};
                     message.ext.weichat.originType = message.ext.weichat.originType || 'webim';
 
+                    // var bodies = {};
+                    // for(var prop in message.body){
+                    //     if(message.body.hasOwnProperty(prop)){
+                    //         bodies[prop] = message.body[prop];
+                    //     }
+                    // }
+
                     var json = {
                         from: conn.context.userId || '',
                         to: message.to,
                         bodies: [message.body],
+                        // bodies: [bodies],
                         ext: message.ext || {}
                     };
 
+
                     var jsonstr = _utils.stringify(json);
+
+                    alert("JSONString: "+jsonstr);
+
                     var dom = $msg({
                         type: message.group || 'chat',
                         to: message.toJid,
@@ -4301,6 +4350,7 @@
                             _msgHash[message.id].msg.fail instanceof Function && _msgHash[message.id].msg.fail(message.id);
                         }
                     }, 60000);
+                    alert("Tree: " + dom.tree().xml);
                     conn.sendCommand(dom.tree(), message.id);
                 };
 
@@ -4343,6 +4393,8 @@
                     me.msg.onFileUploadComplete = _complete;
                     _utils.uploadFile.call(conn, me.msg);
                 } else {
+                    // alert("ScareCrow: "+ WebIM.utils.stringify(me.msg.body));
+                    // return;
                     me.msg.body = {
                         type: me.msg.type === 'chat' ? 'txt' : me.msg.type,
                         msg: me.msg.msg
@@ -4354,7 +4406,6 @@
                         me.msg.body.lat = me.msg.lat;
                         me.msg.body.lng = me.msg.lng;
                     }
-
                     _send(me.msg);
                 }
             };

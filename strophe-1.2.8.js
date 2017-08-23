@@ -2485,9 +2485,7 @@
 
                 // parse jid for domain
                 this.domain = Strophe.getDomainFromJid(this.jid);
-
                 this._changeConnectStatus(Strophe.Status.CONNECTING, null);
-
                 this._proto._connect(wait, hold, route);
             },
 
@@ -2570,7 +2568,7 @@
              */
             _sessionCachingSupported: function () {
                 if (this._proto instanceof Strophe.Bosh) {
-                    if (!JSON) {
+                    if ("JSON" in window) {
                         return false;
                     }
                     try {
@@ -4498,7 +4496,7 @@
              */
             _restore: function (jid, callback, wait, hold, wind) {
                 var session = undefined;
-                if(JSON)
+                if("JSON" in window)
                     session = JSON.parse(window.sessionStorage.getItem('strophe-bosh-session'));
                 if (typeof session !== "undefined" &&
                     session !== null &&
@@ -4917,13 +4915,17 @@
                     try {
                         var contentType = this._conn.options.contentType || "text/xml; charset=utf-8";
                         req.xhr.open("POST", this._conn.service, this._conn.options.sync ? false : true);
-                        req.xhr.setRequestHeader && req.xhr.setRequestHeader("Content-Type", contentType);
+                        if("setRequestHeader" in req.xhr){
+                            req.xhr.setRequestHeader("Content-Type", contentType);
+                        }
+                        // req.xhr.setRequestHeader && req.xhr.setRequestHeader("Content-Type", contentType);
                         if (this._conn.options.withCredentials) {
                             req.xhr.withCredentials = true;
                         }
                     } catch (e2) {
                         Strophe.error("XHR open failed.");
                         if (!this._conn.connected) {
+                            alert("Bad");
                             this._conn._changeConnectStatus(Strophe.Status.CONNFAIL,
                                 "bad-service");
                         }

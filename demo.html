@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Clock</title>
+    <script src="./console-pollyfy.js"></script>
     <script src="./webim.config.js"></script>
     <script src="./strophe-1.2.8.js"></script>
     <script src="./websdk-1.4.8.js"></script>
@@ -98,7 +99,7 @@
     //    };
 
     Strophe.log = function (level, msg) {
-        console.log(level + '----', msg);
+//        console.log(level + '----', msg);
     };
 
     /**
@@ -130,16 +131,8 @@
     // listern，添加回调函数;
     conn.listen({
         onOpened: function (message) {
-            //连接成功回调，连接成功后才可以发送消息
-            //如果isAutoLogin设置为false，那么必须手动设置上线，否则无法收消息
-            // 手动上线指的是调用conn.setPresence(); 在本例中，conn初始化时已将isAutoLogin设置为true
-            // 所以无需调用 conn.setPresence();
             alert("Opened");
-            if (noLog) {
-                alert("opened");
-            } else {
-                console.log("opened");
-            }
+            console.log("Opened");
         },
         onTextMessage: function (message) {
             // 在此接收和处理消息，根据message.type区分消息来源，私聊或群组或聊天室;
@@ -178,7 +171,7 @@
 
             var options = {url: message.url};
             options.onFileDownloadComplete = function () {
-                // 图片下载成功
+                // 图片下载成功;
                 if (noLog) {
                     alert('Image download complete!');
                 } else {
@@ -187,22 +180,22 @@
             };
             options.onFileDownloadError = function () {
                 // 图片下载失败
-                console.log('Image download failed!');
+//                console.log('Image download failed!');
             };
             WebIM.utils.download.call(conn, options);       // 意义待查;
 
         }, //收到图片消息;
         onCmdMessage: function (message) {
-            console.log('CMD');
+//            console.log('CMD');
         },     //收到命令消息;
         onAudioMessage: function (message) {
-            console.log("Audio");
+//            console.log("Audio");
         },   //收到音频消息;
         onLocationMessage: function (message) {
-            console.log("Location");
+//            console.log("Location");
         },//收到位置消息;
         onFileMessage: function (message) {
-            console.log("File");
+//            console.log("File");
         },    //收到文件消息;
         onVideoMessage: function (message) {
             var node = document.getElementById('privateVideo');
@@ -216,7 +209,7 @@
                     node.src = objectURL;
                 },
                 onFileDownloadError: function () {
-                    console.log('File down load error.')
+//                    console.log('File down load error.')
                 }
             };
             WebIM.utils.download.call(conn, option);
@@ -252,34 +245,35 @@
                 case 'unsubscribed':                        // 被拒绝添加好友，或被对方删除好友成功;
                     break;
                 case 'joinChatRoomSuccess':                 // 成功加入聊天室;
-                    console.log('join chat room success');
+//                    console.log('join chat room success');
                     break;
                 case 'joinChatRoomFaild':                   // 加入聊天室失败;
-                    console.log('join chat room faild');
+//                    console.log('join chat room faild');
                     break;
                 case 'joinPublicGroupSuccess':              // 意义待查;
-                    console.log('join public group success', message.from);
+//                    console.log('join public group success', message.from);
                     break;
             }
         },       //收到联系人订阅请求（加好友）、处理群组、聊天室被踢解散等消息;
         onRoster: function (message) {
-            console.log('Roster');
+//            console.log('Roster');
         },         //处理好友申请;
         onInviteMessage: function (message) {
-            console.log('Invite');
+//            console.log('Invite');
         },  //处理群组邀请;
         onOnline: function () {
-            console.log('onLine');
+//            console.log('onLine');
         },                  //本机网络连接成功;
         onOffline: function () {
-            console.log('offline');
+//            console.log('offline');
         },                 //本机网络掉线;
         onError: function (message) {
-            console.log('Error', WebIM.utils.stringify(message));
+//            console.log('Error', WebIM.utils.stringify(message));
+            alert("Error: " + WebIM.utils.stringify(message));
         },           //失败回调;
         onBlacklistUpdate: function (list) {
             // 查询黑名单，将好友拉黑，将好友从黑名单移除都会回调这个函数，list则是黑名单现有的所有好友信息;
-            console.log(list);
+//            console.log(list);
         }     // 黑名单变动;
     });
     // 初始化WebRTC Call
@@ -328,14 +322,14 @@
 // open，登录;
     var options = {
         apiUrl: WebIM.config.apiURL,
-        user: "zzf1",
-        pwd: "z",
+        user: "myy5",
+        pwd: "m",
         appKey: WebIM.config.appkey
     };
     try {
         conn.open(options);
     } catch (e) {
-        alert('open fail'+e.message)
+//        alert('open fail' + e.message)
     }
 
     // 私聊发送文本消息，发送表情同发送文本消息，只是会在对方客户端将表情文本进行解析成图片;
@@ -344,10 +338,13 @@
         var msg = new WebIM.message('txt', id);
         msg.set({
             msg: 'scarecrow',                       // 消息内容;
-            to: 'ss007cc',                          // 接收消息对象;
+            to: 'myy4',                          // 接收消息对象;
             roomType: false,
             success: function (id, serverMsgId) {
-                console.log("send private text Success");
+                alert("Send private text success");
+            },
+            fail: function () {
+                alert("Send private text failed");
             }
         });
         msg.body.chatType = 'singleChat';
@@ -361,10 +358,10 @@
             nickname: 'clock',
             appKey: WebIM.config.appkey,
             success: function () {
-                console.log('regist success!');
+//                console.log('regist success!');
             },
             error: function () {
-                console.log('regist error');
+//                console.log('regist error');
             },
             apiUrl: WebIM.config.apiURL
         };
@@ -380,7 +377,7 @@
             to: 'ss007cc',
             roomType: false,
             success: function (id, serverMsgId) {
-                console.log('CMD Success');
+//                console.log('CMD Success');
             }
         });
         msg.body.chatType = 'singleChat';
@@ -399,9 +396,9 @@
             'png': true,
             'bmp': true
         };
-        console.log(file)
+//        console.log(file)
 //        if (file.filetype.toLowerCase() in allowType) {;
-        console.log('send', WebIM.config.apiURL);
+//        console.log('send', WebIM.config.apiURL);
         var option = {
             apiUrl: WebIM.config.apiURL,
             file: file,
@@ -410,13 +407,13 @@
             chatType: 'singleChat',
             flashUpload: WebIM.flashUpload,
             onFileUploadError: function () {
-                console.log('onFileUploadError');
+//                console.log('onFileUploadError');
             },
             onFileUploadComplete: function () {
-                console.log('onFileUploadComplete');
+//                console.log('onFileUploadComplete');
             },
             success: function () {
-                console.log('Success');
+//                console.log('Success');
             }
             // flashUpload: WebIM.flashUpload               // 意义待查;
         };
@@ -444,9 +441,9 @@
                  ];
                  */
                 for (var o in roster) {
-                    console.log("jid: ", roster[o].jid);
-                    console.log("name: ", roster[o].name);
-                    console.log("subscription: ", roster[o].subscription);
+//                    console.log("jid: ", roster[o].jid);
+//                    console.log("name: ", roster[o].name);
+//                    console.log("subscription: ", roster[o].subscription);
                 }
             }
         };
@@ -527,10 +524,10 @@
             list: list,
             type: 'jid',
             success: function () {
-                console.log('Add friend to black list success');
+//                console.log('Add friend to black list success');
             },
             error: function () {
-                console.log('Add friend to black list error');
+//                console.log('Add friend to black list error');
             }
         });
     }
@@ -547,10 +544,10 @@
             list: list,
             type: 'jid',
             success: function () {
-                console.log('Remove from black list success.');
+//                console.log('Remove from black list success.');
             },
             error: function () {
-                console.log('Remove from black list error.')
+//                console.log('Remove from black list error.')
             }
         });
     };
@@ -566,10 +563,10 @@
             roomType: true,
             chatType: 'chatRoom',
             success: function () {
-                console.log('send room text success');
+//                console.log('send room text success');
             },
             fail: function () {
-                console.log('failed');
+//                console.log('failed');
             }
         };
         msg.set(option);
@@ -580,7 +577,7 @@
     var joinRoom = function () {
         // 加入聊天室;
         conn.joinChatRoom({
-            roomId: "114715680632209992"
+            roomId: "25063631945729"
         });
     };
     // 退出聊天室;
@@ -597,10 +594,10 @@
             pagenum: 1,                                 // 页数;
             pagesize: 20,                               // 每页个数;
             success: function (list) {
-                console.log(list);
+//                console.log(list);
             },
             error: function () {
-                console.log('List chat room error');
+//                console.log('List chat room error');
             }
         };
         conn.getChatRooms(option);
@@ -616,10 +613,10 @@
             roomType: false,
             chatType: 'chatRoom',
             success: function () {
-                console.log('send room text success');
+//                console.log('send room text success');
             },
             fail: function () {
-                console.log('failed');
+//                console.log('failed');
             }
         };
         msg.set(option);
@@ -658,12 +655,12 @@
              };
              */
             success: function (settings, members, fields) {
-                console.log('settings: ', settings);
-                console.log('members: ', members);
-                console.log('fields: ', fields);
+//                console.log('settings: ', settings);
+//                console.log('members: ', members);
+//                console.log('fields: ', fields);
             },
             error: function () {
-                console.log('Error!');
+//                console.log('Error!');
             }
         });
     };
@@ -673,10 +670,10 @@
             to: 'asdfghj',
             roomId: '1480747027186',
             success: function () {
-                console.log('You leave room succeed!');
+//                console.log('You leave room succeed!');
             },
             error: function () {
-                console.log('Leave room faild');
+//                console.log('Leave room faild');
             }
         };
         conn.leaveGroupBySelf(option);
@@ -687,7 +684,7 @@
             affiliation: "owner",                       // 写死;
             roomId: "1480756943693",                    // 群组ID;
             success: function () {
-                console.log('add to black list succeed');
+//                console.log('add to black list succeed');
             },
             to: 'asdfghj'                               // 需要删除的成员ID;
         };
@@ -697,10 +694,10 @@
     var listGroups = function () {
         var option = {
             success: function (rooms) {
-                console.log(rooms);
+//                console.log(rooms);
             },
             error: function () {
-                console.log('List chat rooms error');
+//                console.log('List chat rooms error');
             }
         };
         conn.listRooms(option);
@@ -712,7 +709,7 @@
             subject: 'ChangeTest',
             description: 'Change group information test',
             success: function () {
-                console.log("Change Group Names Success!");
+//                console.log("Change Group Names Success!");
             }
         };
         conn.changeGroupSubject(option);
@@ -722,10 +719,10 @@
         var option = {
             roomId: '1480758709661',
             success: function (list) {
-                console.log('Get group black list: ', list);
+//                console.log('Get group black list: ', list);
             },
             error: function () {
-                console.log('Get group black list error.');
+//                console.log('Get group black list error.');
             }
         };
         conn.getGroupBlacklist(option);
@@ -736,7 +733,7 @@
             reason: 'Test Destroy Group',
             roomId: '1480840256052',
             success: function () {
-                console.log('Destroy group success!');
+//                console.log('Destroy group success!');
             }
         };
         conn.destroyGroup(option);
@@ -755,7 +752,7 @@
             roomId: '1480841456167',
             to: 'wjy6',
             success: function () {
-                console.log('Remove from black list success!');
+//                console.log('Remove from black list success!');
             }
         };
         conn.removeGroupMemberFromBlacklist(option);
@@ -771,7 +768,7 @@
             success: function (members) {
                 for (var o in members) {
                     member = members[o];
-                    console.log(member);
+//                    console.log(member);
                 }
             }
         });
