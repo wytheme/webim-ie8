@@ -112,7 +112,6 @@
                 if (typeof window.XDomainRequest === 'undefined') {
                     return temp;
                 }
-                alert("XDomainRequest");
                 var xhr = new XDomainRequest();
                 xhr.readyState = 0;
                 xhr.status = 100;
@@ -1550,7 +1549,6 @@
                 try {
                     stropheConn.connect(conn.context.jid, '$t$' + accessToken, callback, conn.wait, conn.hold);
                 } catch (e) {
-                    alert("Error: " + _utils.stringify(e));
                 }
             }
         };
@@ -2150,14 +2148,12 @@
                 var orgName = this.context.orgName;
 
                 var suc = function suc(data, xhr) {
-                    alert("Login succeed, Token: " + data.access_token);
                     conn.context.status = _code.STATUS_DOLOGIN_IM;
                     conn.context.restTokenData = data;
                     if (options.success) options.success(data);
                     _login(data, conn);
                 };
                 var error = function error(res, xhr, msg) {
-                    alert('Token error: ' + xhr)
                     if (options.error) options.error();
                     if (location.protocol != 'https:' && conn.isHttpDNS) {
                         if (conn.restIndex + 1 < conn.restTotal) {
@@ -2843,7 +2839,6 @@
                     _msgHash[message.id] = new _message(message);
                     _msgHash[message.id].send(this);
                 } else if (typeof message === 'string') {
-                    alert("Str Msg");
                     _msgHash[message] && _msgHash[message].send(this);
                 }
             }
@@ -4332,7 +4327,6 @@
 
                     var jsonstr = _utils.stringify(json);
 
-                    alert("JSONString: "+jsonstr);
 
                     var dom = $msg({
                         type: message.group || 'chat',
@@ -4350,7 +4344,6 @@
                             _msgHash[message.id].msg.fail instanceof Function && _msgHash[message.id].msg.fail(message.id);
                         }
                     }, 60000);
-                    alert("Tree: " + dom.tree().xml);
                     conn.sendCommand(dom.tree(), message.id);
                 };
 
