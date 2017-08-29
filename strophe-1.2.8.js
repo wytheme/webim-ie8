@@ -2372,6 +2372,16 @@
                 this.paused = true;
             },
 
+            setJid: function (jid) {
+                this.jid = jid;
+                this.authzid = Strophe.getBareJidFromJid(this.jid);
+                this.authcid = Strophe.getNodeFromJid(this.jid);
+            },
+
+            getJid: function () {
+                return this.jid;
+            },
+
             /** Function: resume
              *  Resume the request manager.
              *
@@ -3505,9 +3515,25 @@
 
                     var resource = Strophe.getResourceFromJid(this.jid);
                     if (resource) {
-                        this.send($iq({type: "set", id: "_bind_auth_2"})
-                            .c('bind', {xmlns: Strophe.NS.BIND})
-                            .c('resource', {}).t(resource).tree());
+                        // this.send($iq({type: "set", id: "_bind_auth_2"})
+                        //     .c('bind', {xmlns: Strophe.NS.BIND})
+                        //     .c('resource', {}).t(resource).tree());
+                        try {
+                            this.send(
+                                $iq({type: "set", id: "_bind_auth_2"})
+                                    .c('bind', {xmlns: Strophe.NS.BIND})
+                                    .c('resource', {}).t(resource)
+                                    .up()
+                                    .c('os').t('webim')
+                                    .up()
+                                    .c('device_uuid').t('device_uuid')
+                                    .up()
+                                    .c('is_manual_login').t('true')
+                                    .tree()
+                            );
+                        } catch (e) {
+                            console.log("Bind Error: ", e.message);
+                        }
                     } else {
                         this.send($iq({type: "set", id: "_bind_auth_2"})
                             .c('bind', {xmlns: Strophe.NS.BIND})

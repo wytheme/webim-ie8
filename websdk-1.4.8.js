@@ -1232,6 +1232,7 @@
         var _message = _msg._msg;
         var _msgHash = {};
         var Queue = __webpack_require__(233).Queue;
+        var stropheConn = null;
 
         window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
 
@@ -1283,6 +1284,14 @@
          * Fix it by overide  _onMessage
          */
         Strophe.Websocket.prototype._onMessage = function (message) {
+            // 获取Resource
+            var data = message.data;
+            if (data.indexOf('<jid>') > 0) {
+                var start = data.indexOf('<jid>'),
+                    end = data.indexOf('</jid>'),
+                    data = data.substring(start + 5, end);
+                stropheConn.setJid(data);
+            }
             WebIM && WebIM.config.isDebug && console.log('recv: ', message.data);
             var elem, data;
             // check for closing stream
@@ -1529,7 +1538,6 @@
             }
             conn.context.accessToken = options.access_token;
             conn.context.accessTokenExpires = options.expires_in;
-            var stropheConn = null;
             if (conn.isOpening() && conn.context.stropheConn) {
                 stropheConn = conn.context.stropheConn;
             } else if (conn.isOpened() && conn.context.stropheConn) {
@@ -2272,19 +2280,29 @@
         };
 
         connection.prototype.notifyVersion = function (suc, fail) {
-            var jid = _getJid({}, this);
+            var jid = stropheConn.getJid();
+            this.context.jid = jid;
             var dom = $iq({
-                from: this.context.jid || '',
-                to: this.domain,
-                type: 'result'
-            }).c('query', {xmlns: 'jabber:iq:version'}).c('name').t('easemob').up().c('version').t(_version).up().c('os').t('webim');
+                from: jid || ''
+                , to: this.domain
+                , type: 'result'
+            })
+                .c('query', {xmlns: 'jabber:iq:version'})
+                .c('name')
+                .t('easemob')
+                .up()
+                .c('version')
+                .t(_version)
+                .up()
+                .c('os')
+                .t('webim');
 
             var suc = suc || _utils.emptyfn;
             var error = fail || this.onError;
-            var failFn = function failFn(ele) {
+            var failFn = function (ele) {
                 error({
-                    type: _code.WEBIM_CONNCTION_NOTIFYVERSION_ERROR,
-                    data: ele
+                    type: _code.WEBIM_CONNCTION_NOTIFYVERSION_ERROR
+                    , data: ele
                 });
             };
             this.context.stropheConn.sendIQ(dom.tree(), suc, failFn);

@@ -131,8 +131,8 @@
     // listern，添加回调函数;
     conn.listen({
         onOpened: function (message) {
-            alert("Opened");
             console.log("Opened");
+            conn.setPresence();
         },
         onTextMessage: function (message) {
             // 在此接收和处理消息，根据message.type区分消息来源，私聊或群组或聊天室;
@@ -186,7 +186,7 @@
 
         }, //收到图片消息;
         onCmdMessage: function (message) {
-//            console.log('CMD');
+            console.log('CMD');
         },     //收到命令消息;
         onAudioMessage: function (message) {
 //            console.log("Audio");
@@ -322,8 +322,8 @@
 // open，登录;
     var options = {
         apiUrl: WebIM.config.apiURL,
-        user: "myy5",
-        pwd: "m",
+        user: "zzf1",
+        pwd: "z",
         appKey: WebIM.config.appkey
     };
     try {
@@ -374,7 +374,7 @@
         var msg = new WebIM.message('cmd', id);
         msg.set({
             msg: 'ls',
-            to: 'ss007cc',
+            to: 'zzf2',
             roomType: false,
             success: function (id, serverMsgId) {
 //                console.log('CMD Success');
