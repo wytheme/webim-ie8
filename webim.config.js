@@ -13,7 +13,7 @@ WebIM.config = {
     xmppURL: 'im-api.easemob.com',
     // xmppURL: '192.168.117.37:52800',
     /*
-     * Backend REST API URL 
+     * Backend REST API URL
      */
     apiURL: (location.protocol === 'https:' ? 'https:' : 'https:') + '//a1.easemob.com',
     // apiURL: (location.protocol === 'https:' ? 'https:' : 'https:') + '//192.168.100.39:8843/im-reset',
