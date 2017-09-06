@@ -39,6 +39,7 @@
 <h2>ChatRoom</h2>
 <div>
     <button id="roomJoin">JoinRoom</button>
+    <button id="roomCmd">RoomCmd</button>
     <button id="roomText">RoomText</button>
     <button id="roomQuit">RoomQuit</button>
     <button id="listChatRooms">ListChatRooms</button>
@@ -113,7 +114,8 @@
         isAutoLogin: false,
         heartBeatWait: WebIM.config.heartBeatWait,
         autoReconnectNumMax: WebIM.config.autoReconnectNumMax,
-        autoReconnectInterval: WebIM.config.autoReconnectInterval
+        autoReconnectInterval: WebIM.config.autoReconnectInterval,
+        apiUrl: WebIM.config.apiURL
     });
     var browser = navigator.appName;
     var b_version = navigator.appVersion;
@@ -131,8 +133,9 @@
     // listern，添加回调函数;
     conn.listen({
         onOpened: function (message) {
-            alert("Opened");
+//            alert("Opened");
             console.log("Opened");
+            conn.setPresence();
         },
         onTextMessage: function (message) {
             // 在此接收和处理消息，根据message.type区分消息来源，私聊或群组或聊天室;
@@ -186,7 +189,7 @@
 
         }, //收到图片消息;
         onCmdMessage: function (message) {
-//            console.log('CMD');
+            console.log('CMD');
         },     //收到命令消息;
         onAudioMessage: function (message) {
 //            console.log("Audio");
@@ -245,7 +248,7 @@
                 case 'unsubscribed':                        // 被拒绝添加好友，或被对方删除好友成功;
                     break;
                 case 'joinChatRoomSuccess':                 // 成功加入聊天室;
-//                    console.log('join chat room success');
+                    console.log('join chat room success');
                     break;
                 case 'joinChatRoomFaild':                   // 加入聊天室失败;
 //                    console.log('join chat room faild');
@@ -268,8 +271,8 @@
 //            console.log('offline');
         },                 //本机网络掉线;
         onError: function (message) {
-//            console.log('Error', WebIM.utils.stringify(message));
-            alert("Error: " + WebIM.utils.stringify(message));
+            console.log('Error', WebIM.utils.stringify(message));
+//            alert("Error: " + WebIM.utils.stringify(message));
         },           //失败回调;
         onBlacklistUpdate: function (list) {
             // 查询黑名单，将好友拉黑，将好友从黑名单移除都会回调这个函数，list则是黑名单现有的所有好友信息;
@@ -322,8 +325,8 @@
 // open，登录;
     var options = {
         apiUrl: WebIM.config.apiURL,
-        user: "myy5",
-        pwd: "m",
+        user: "zzf1",
+        pwd: "z",
         appKey: WebIM.config.appkey
     };
     try {
@@ -338,7 +341,7 @@
         var msg = new WebIM.message('txt', id);
         msg.set({
             msg: 'scarecrow',                       // 消息内容;
-            to: 'myy4',                          // 接收消息对象;
+            to: 'zzf2',                          // 接收消息对象;
             roomType: false,
             success: function (id, serverMsgId) {
                 alert("Send private text success");
@@ -374,7 +377,7 @@
         var msg = new WebIM.message('cmd', id);
         msg.set({
             msg: 'ls',
-            to: 'ss007cc',
+            to: 'zzf2',
             roomType: false,
             success: function (id, serverMsgId) {
 //                console.log('CMD Success');
@@ -554,12 +557,12 @@
 
     // 聊天室发送文本消息;
     var sendRoomText = function () {
-        // 退出聊天室;
         var id = conn.getUniqueId();
         var msg = new WebIM.message('txt', id);
         var option = {
-            msg: 'scarecrfow',                       // 消息内容;
-            to: '114715680632209992',               // 接收消息对象(本例为twy-room1聊天室);
+            msg: 'scarecrow',                       // 消息内容;
+            to: '25226586947585',               // 接收消息对象(本例为twy-room1聊天室);
+//            to: '25864149467147',
             roomType: true,
             chatType: 'chatRoom',
             success: function () {
@@ -573,18 +576,54 @@
         msg.setGroup('groupchat');
         conn.send(msg.body);
     };
+
+    // 聊天室发送命令消息;
+    var sendRoomCmd = function () {
+        var id = conn.getUniqueId();
+        var msg = new WebIM.message('cmd', id);
+        var option = {
+            msg: 'lslslslslsls',                       // 消息内容;
+            to: '25226586947585',
+//            to: '25864149467147',               // 接收消息对象(本例为twy-room1聊天室);
+            roomType: true,
+            chatType: 'chatRoom',
+            success: function () {
+//                console.log('send room text success');
+            },
+            fail: function () {
+//                console.log('failed');
+            }
+        };
+        msg.set(option);
+        msg.setGroup('groupchat');
+        conn.send(msg.body);
+    };
+
     // 加入聊天室;
     var joinRoom = function () {
         // 加入聊天室;
         conn.joinChatRoom({
-            roomId: "25063631945729"
+            roomId: "26399826051073"
+//            roomId: "25864149467147"
         });
     };
+
+    // 获取加入的聊天室
+    var getJoinedRoom = function(){
+        var options = {
+            success: function(data){
+                console.log("Data: ", data);
+            }
+        }
+        conn.getJoinedChatRooms(options);
+    };
+
     // 退出聊天室;
     var quitRoom = function () {
         // 退出聊天室;
         conn.quitChatRoom({
-            roomId: "114715680632209992"
+            roomId: "25226586947585"
+//            roomId: "25864149467147"
         });
     };
     // 列出所有聊天室，支持分页查询;
@@ -805,6 +844,7 @@
         document.getElementById('removeFromBlackList').onclick = removeBlackList;
 
         document.getElementById('roomText').onclick = sendRoomText;
+        document.getElementById('roomCmd').onclick = sendRoomCmd;
         document.getElementById('roomJoin').onclick = joinRoom;
         document.getElementById('roomQuit').onclick = quitRoom;
         document.getElementById('listChatRooms').onclick = listRooms;

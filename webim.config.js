@@ -11,14 +11,18 @@ WebIM.config = {
      * XMPP server
      */
     xmppURL: 'im-api.easemob.com',
+    // xmppURL: '192.168.117.37:52800',
     /*
      * Backend REST API URL 
      */
-    apiURL: (location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com',
+    apiURL: (location.protocol === 'https:' ? 'https:' : 'https:') + '//a1.easemob.com',
+    // apiURL: (location.protocol === 'https:' ? 'https:' : 'https:') + '//192.168.100.39:8843/im-reset',
+    // apiURL: 'http://192.168.117.37:8080',
     /*
      * Application AppKey
      */
     appkey: 'easemob-demo#chatdemoui',
+    // appkey: 'cmos#im',
     /*
      * Whether to use wss
      * @parameter {Boolean} true or false

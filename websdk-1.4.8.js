@@ -3318,6 +3318,27 @@
             this.context.stropheConn.sendIQ(iq.tree(), suc, errorFn);
         };
 
+        connection.prototype.getJoinedChatRooms = function(options){
+            var apiUrl = this.apiUrl;
+            var appName = this.context.appName;
+            var orgName = this.context.orgName;
+            var token = options.accessToken || this.context.accessToken;
+            var opt = {
+                url: apiUrl + '/' + orgName + '/' + appName + '/users' + '/' + this.context.userId + "/" + "joined_chatrooms",
+                dataType: 'json',
+                type: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                }
+            };
+            opt.success = function (respData) {
+                options.success(respData);
+            };
+            opt.error = options.error || _utils.emptyfn;
+            WebIM.utils.ajax(opt);
+        };
+
         connection.prototype.quitChatRoom = function (options) {
             var roomJid = this.context.appKey + '_' + options.roomId + '@conference.' + this.domain;
             var room_nick = roomJid + '/' + this.context.userId;
