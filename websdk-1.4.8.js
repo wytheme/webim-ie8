@@ -3337,6 +3337,7 @@
         };
 
         connection.prototype.getJoinedChatRooms = function(options){
+            
             var apiUrl = this.apiUrl;
             var appName = this.context.appName;
             var orgName = this.context.orgName;
@@ -3355,6 +3356,7 @@
             };
             opt.error = options.error || _utils.emptyfn;
             WebIM.utils.ajax(opt);
+
         };
 
         connection.prototype.quitChatRoom = function (options) {
